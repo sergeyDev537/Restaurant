@@ -1,7 +1,9 @@
-package com.rest.restaurant.ui.screens
+package com.rest.restaurant.ui.screens.restaurants
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,8 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,16 +30,49 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.rest.restaurant.R
 import com.rest.restaurant.domain.entity.Restaurant
+import com.rest.restaurant.ui.theme.Background
 import com.rest.restaurant.ui.theme.Gray
+import com.rest.restaurant.ui.widgets.ErrorComponent
 import com.rest.restaurant.ui.widgets.HeaderRestaurantComponent
+import com.rest.restaurant.ui.widgets.LoadingComponent
 import com.rest.restaurant.ui.widgets.RatingComponent
 import com.rest.restaurant.ui.widgets.SumCurrencyComponent
 
 @Composable
-fun RestaurantsScreen() {
-    //TODO parse state
+fun RestaurantsScreen(
+    viewModel: RestaurantsViewModel = hiltViewModel()
+) {
+    val state = viewModel.state.collectAsState()
+
+    Box(
+        modifier = Modifier
+            .background(Background),
+        contentAlignment = Alignment.Center,
+    ) {
+        when(val currentState = state.value) {
+            is RestaurantsScreenState.Loading -> {
+//                LoadingComponent()
+            }
+            is RestaurantsScreenState.Success -> {
+                RestaurantsScreenContent(
+                    restaurants = currentState.restaurants,
+                    onLike = { id, isLike ->
+                        viewModel.updateLike(restaurantId = id, isLike = isLike)
+                    }
+                )
+            }
+            is RestaurantsScreenState.Error -> {
+                ErrorComponent(
+                    message = currentState.errorMessage
+                )
+            }
+            is RestaurantsScreenState.Initial -> {}
+        }
+    }
 }
 
 @Composable
@@ -44,8 +82,9 @@ fun RestaurantsScreenContent(
 ) {
     LazyColumn(
         modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .fillMaxSize()
+            .padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(restaurants) { restaurant ->
             RestaurantCard(
@@ -67,13 +106,13 @@ fun RestaurantCard(
         modifier = Modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(26.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
-        //TODO Change To AsyncImage
-        Image(
+        AsyncImage(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(160.dp),
-            painter = painterResource(R.drawable.ic_launcher_background),
+            model = restaurant.imageUrl,
             contentScale = ContentScale.Crop,
             contentDescription = restaurant.name,
         )

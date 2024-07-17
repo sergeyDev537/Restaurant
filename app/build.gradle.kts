@@ -62,10 +62,14 @@ dependencies {
     /*HILT*/
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     /*RETROFIT*/
     implementation(libs.retrofit.base)
     implementation(libs.retrofit.gson)
+
+    /*COIL*/
+    implementation(libs.coil)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
