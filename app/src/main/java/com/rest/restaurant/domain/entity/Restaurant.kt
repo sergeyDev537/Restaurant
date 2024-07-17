@@ -2,6 +2,7 @@ package com.rest.restaurant.domain.entity
 
 data class Restaurant(
     val id: Long,
+    val name: String,
     val imageUrl: String,
     val rating: Float,
     val averageBill: Int,
