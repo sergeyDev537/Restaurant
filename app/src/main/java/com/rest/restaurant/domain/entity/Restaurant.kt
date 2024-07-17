@@ -7,6 +7,6 @@ data class Restaurant(
     val rating: Float,
     val averageBill: Any?,
     val currencyType: String,
-    val typeDishes: String,
+    val typeDishes: String?,
     val isLike: Boolean,
 )

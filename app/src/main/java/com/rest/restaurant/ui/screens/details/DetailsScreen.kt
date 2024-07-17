@@ -3,6 +3,7 @@ package com.rest.restaurant.ui.screens.details
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,12 +45,16 @@ import com.rest.restaurant.ui.widgets.RatingBar
 
 @Composable
 fun DetailsScreen(
+    innerPadding: PaddingValues,
+    restaurantId: Int,
     viewModel: DetailsRestaurantViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsState()
 
     Box(
         modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
             .background(Background),
         contentAlignment = Alignment.Center,
     ) {
@@ -107,9 +112,11 @@ fun DetailsScreenContent(
             }
         )
         Spacer(modifier = Modifier.height(8.dp))
-        DescriptionComponent(
-            description = restaurant.description
-        )
+        if (!restaurant.description.isNullOrEmpty()) {
+            DescriptionComponent(
+                description = restaurant.description
+            )
+        }
     }
 }
 

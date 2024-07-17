@@ -1,10 +1,11 @@
 package com.rest.restaurant.ui.screens.restaurants
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,14 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.rest.restaurant.R
 import com.rest.restaurant.domain.entity.Restaurant
 import com.rest.restaurant.ui.theme.Background
 import com.rest.restaurant.ui.theme.Gray
@@ -44,22 +42,27 @@ import com.rest.restaurant.ui.widgets.SumCurrencyComponent
 
 @Composable
 fun RestaurantsScreen(
-    viewModel: RestaurantsViewModel = hiltViewModel()
+    innerPadding: PaddingValues,
+    viewModel: RestaurantsViewModel = hiltViewModel(),
+    onRestaurantClick: (Int) -> Unit,
 ) {
     val state = viewModel.state.collectAsState()
 
     Box(
         modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
             .background(Background),
         contentAlignment = Alignment.Center,
     ) {
         when(val currentState = state.value) {
             is RestaurantsScreenState.Loading -> {
-//                LoadingComponent()
+                LoadingComponent()
             }
             is RestaurantsScreenState.Success -> {
                 RestaurantsScreenContent(
                     restaurants = currentState.restaurants,
+                    onRestaurantClick = onRestaurantClick,
                     onLike = { id, isLike ->
                         viewModel.updateLike(restaurantId = id, isLike = isLike)
                     }
@@ -78,6 +81,7 @@ fun RestaurantsScreen(
 @Composable
 fun RestaurantsScreenContent(
     restaurants: List<Restaurant>,
+    onRestaurantClick: (Int) -> Unit,
     onLike: (Int, Boolean) -> Unit,
 ) {
     LazyColumn(
@@ -89,6 +93,7 @@ fun RestaurantsScreenContent(
         items(restaurants) { restaurant ->
             RestaurantCard(
                 restaurant = restaurant,
+                onRestaurantClick = onRestaurantClick,
                 onLike = { newLikeStatus ->
                     onLike(restaurant.id, newLikeStatus)
                 }
@@ -100,11 +105,15 @@ fun RestaurantsScreenContent(
 @Composable
 fun RestaurantCard(
     restaurant: Restaurant,
+    onRestaurantClick: (Int) -> Unit,
     onLike: (Boolean) -> Unit,
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable {
+                onRestaurantClick(restaurant.id)
+            },
         shape = RoundedCornerShape(26.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
     ) {
@@ -140,8 +149,8 @@ fun RestaurantCard(
 fun RestaurantInfoLayout(
     rating: Float,
     currencyType: String,
-    averageBill: String,
-    typeDishes: String,
+    averageBill: String?,
+    typeDishes: String?,
 ) {
     Row(
         modifier = Modifier
@@ -154,20 +163,24 @@ fun RestaurantInfoLayout(
             textColor = Color.Black,
         )
         Spacer(modifier = Modifier.width(8.dp))
-        SumCurrencyComponent(
-            sum = averageBill,
-            currency = currencyType,
-            textColor = Gray,
-            textSize = 15.sp,
-        )
+        if (!averageBill.isNullOrEmpty()) {
+            SumCurrencyComponent(
+                sum = averageBill,
+                currency = currencyType,
+                textColor = Gray,
+                textSize = 15.sp,
+            )
+        }
         Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = typeDishes,
-            color = Gray,
-            fontSize = 15.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        if (!typeDishes.isNullOrEmpty()) {
+            Text(
+                text = typeDishes,
+                color = Gray,
+                fontSize = 15.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
@@ -197,6 +210,7 @@ fun RestaurantCardPreview() {
     )
     RestaurantCard(
         restaurant = restaurant,
+        onRestaurantClick = {},
         onLike = {},
     )
 }
@@ -217,6 +231,7 @@ fun RestaurantsScreenContentPreview() {
     val restaurants = listOf(restaurant, restaurant, restaurant, restaurant, restaurant, restaurant, restaurant, restaurant)
     RestaurantsScreenContent(
         restaurants = restaurants,
+        onRestaurantClick = {},
         onLike = { id, newLikeStatus ->
 
         }

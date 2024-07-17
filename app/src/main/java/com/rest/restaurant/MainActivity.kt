@@ -4,18 +4,28 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
+import com.rest.restaurant.navigation.AppNavGraph
+import com.rest.restaurant.navigation.Screen
+import com.rest.restaurant.navigation.rememberNavigationState
+import com.rest.restaurant.ui.screens.details.DetailsScreen
 import com.rest.restaurant.ui.screens.restaurants.RestaurantsScreen
 import com.rest.restaurant.ui.theme.RestaurantTheme
+import com.rest.restaurant.ui.widgets.FavouriteToolbarComponent
 import dagger.hilt.android.AndroidEntryPoint
 
+@OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,10 +33,51 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RestaurantTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        RestaurantsScreen()
+                val navigationState = rememberNavigationState()
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    text = stringResource(R.string.restaurants),
+                                    fontSize = 17.sp,
+                                    textAlign = TextAlign.Center,
+                                )
+                            },
+                            actions = {
+                                FavouriteToolbarComponent(
+                                    count = 15,
+                                    isFilled = navigationState.screenIsFavourite(),
+                                    onClick = {
+                                        navigationState.navigateTo(Screen.ROUTE_FAVOURITE)
+                                    }
+                                )
+                            }
+                        )
                     }
+                ) { innerPadding ->
+                    AppNavGraph(
+                        navHostController = navigationState.navHostController,
+                        restaurantsScreenContent = {
+                            RestaurantsScreen(
+                                innerPadding = innerPadding,
+                                onRestaurantClick = { id ->
+                                    navigationState.navigateToSingleRestaurant(restaurantId = id)
+                                },
+                            )
+                        },
+                        singleRestaurantScreenContent = { restaurantId ->
+                            DetailsScreen(
+                                innerPadding = innerPadding,
+                                restaurantId = restaurantId,
+                            )
+                        },
+                        favouriteScreenContent = { },
+                    )
                 }
             }
         }

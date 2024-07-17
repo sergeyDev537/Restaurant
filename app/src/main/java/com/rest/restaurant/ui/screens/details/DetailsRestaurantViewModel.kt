@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.rest.restaurant.domain.usecases.GetRestaurantsUseCase
 import com.rest.restaurant.domain.usecases.GetSingleRestaurantUseCase
 import com.rest.restaurant.domain.usecases.UpdateLikeRestaurantUseCase
+import com.rest.restaurant.navigation.Screen
 import com.rest.restaurant.ui.screens.restaurants.RestaurantsScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -22,7 +23,7 @@ class DetailsRestaurantViewModel @Inject constructor(
     private val updateLikeRestaurantUseCase: UpdateLikeRestaurantUseCase,
 ): ViewModel() {
 
-    val restaurantId = savedStateHandle.getLiveData<Int>("restaurantId")
+    val restaurantId = savedStateHandle.getStateFlow(Screen.KEY_RESTAURANT_ID, 0)
 
     val state = getSingleRestaurantUseCase(restaurantId = restaurantId.value ?: 0)
         .map { DetailsScreenState.Success(it) as DetailsScreenState }

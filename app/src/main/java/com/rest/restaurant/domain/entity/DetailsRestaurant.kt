@@ -7,7 +7,7 @@ data class DetailsRestaurant(
     val rating: Float,
     val averageBill: Any?,
     val currencyType: String,
-    val typeDishes: String,
+    val typeDishes: String?,
     val isLike: Boolean,
-    val description: String,
+    val description: String?,
 )

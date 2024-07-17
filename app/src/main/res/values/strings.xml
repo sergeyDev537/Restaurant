@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Restaurant</string>
     <string name="description">Описание</string>
+    <string name="restaurants">Restaurants</string>
+    <string name="restaurant">Restaurant</string>
+    <string name="favourite">Favourites</string>
 </resources>
