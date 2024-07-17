@@ -1,15 +1,17 @@
 package com.rest.restaurant.domain.repos
 
+import com.rest.restaurant.domain.entity.DetailsRestaurant
 import com.rest.restaurant.domain.entity.Restaurant
+import kotlinx.coroutines.flow.Flow
 
 interface RestaurantRepo {
 
-    fun getRestaurants(): List<Restaurant>
+    fun getRestaurants(): Flow<List<Restaurant>>
 
-    fun getSingleRestaurant(restaurantId: Int): Restaurant
+    fun getSingleRestaurant(restaurantId: Int): Flow<DetailsRestaurant>
 
-    fun updateLikeRestaurant(restaurantId: Int, isLike: Boolean): Boolean
+    fun updateLikeRestaurant(restaurantId: Int, isLike: Boolean): Flow<Boolean>
 
-    fun getCountLikesRestaurant(): Int
+    fun getCountLikesRestaurant(): Flow<Int>
 
 }

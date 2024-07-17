@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rest.restaurant.R
+import com.rest.restaurant.domain.entity.DetailsRestaurant
 import com.rest.restaurant.domain.entity.Restaurant
 import com.rest.restaurant.ui.theme.AccentBlue
 import com.rest.restaurant.ui.theme.Gray
@@ -44,8 +45,8 @@ fun DetailsScreen() {
 
 @Composable
 fun DetailsScreenContent(
-    restaurant: Restaurant,
-    onLike: (Long, Boolean) -> Unit,
+    restaurant: DetailsRestaurant,
+    onLike: (Int, Boolean) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -170,10 +171,10 @@ fun DescriptionComponent(
 @Preview
 @Composable
 fun DetailsScreenContentPreview() {
-    val restaurant = Restaurant(
-        id = 0L,
+    val restaurant = DetailsRestaurant(
+        id = 0,
         name = "Aster Bakery",
-        imageUrl = "",
+        imageUrls = listOf(),
         rating = 4.5F,
         averageBill = 1000,
         currencyType = "€",

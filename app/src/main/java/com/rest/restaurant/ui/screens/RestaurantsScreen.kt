@@ -40,7 +40,7 @@ fun RestaurantsScreen() {
 @Composable
 fun RestaurantsScreenContent(
     restaurants: List<Restaurant>,
-    onLike: (Long, Boolean) -> Unit,
+    onLike: (Int, Boolean) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -147,7 +147,7 @@ fun RestaurantInfoLayoutPreview() {
 @Composable
 fun RestaurantCardPreview() {
     val restaurant = Restaurant(
-        id = 0L,
+        id = 0,
         name = "Aster Bakery",
         imageUrl = "",
         rating = 4.5F,
@@ -155,7 +155,6 @@ fun RestaurantCardPreview() {
         currencyType = "€",
         typeDishes = "Суши, Пицца, Завтраки, Американская, Грузинская",
         isLike = true,
-        description = ""
     )
     RestaurantCard(
         restaurant = restaurant,
@@ -167,7 +166,7 @@ fun RestaurantCardPreview() {
 @Composable
 fun RestaurantsScreenContentPreview() {
     val restaurant = Restaurant(
-        id = 0L,
+        id = 0,
         name = "Aster Bakery",
         imageUrl = "",
         rating = 4.5F,
@@ -175,7 +174,6 @@ fun RestaurantsScreenContentPreview() {
         currencyType = "€",
         typeDishes = "Суши, Пицца, Завтраки, Американская, Грузинская",
         isLike = true,
-        description = ""
     )
     val restaurants = listOf(restaurant, restaurant, restaurant, restaurant, restaurant, restaurant, restaurant, restaurant)
     RestaurantsScreenContent(
