@@ -28,6 +28,7 @@ class RestaurantRepoImpl @Inject constructor(
     val refreshGlobalLike = MutableSharedFlow<Unit>()
     val refreshLocalLike = MutableSharedFlow<Int>()
     val restaurantsLocale = MutableStateFlow<List<Restaurant>>(emptyList())
+    val singleRestaurantLocale = MutableStateFlow<DetailsRestaurant?>(null)
 
     override fun getRestaurants(): Flow<List<Restaurant>> = flow {
         val restaurants = getRestaurantsOnApi()
@@ -68,10 +69,24 @@ class RestaurantRepoImpl @Inject constructor(
     }
 
     override fun getSingleRestaurant(restaurantId: Int): Flow<DetailsRestaurant> = flow {
-        emit(getSingleRestaurantsOnApi(restaurantId))
-        refreshGlobalLike.collect {
-            getSingleRestaurantsOnApi(restaurantId)
-        }
+        val singleRest = getSingleRestaurantsOnApi(restaurantId)
+        singleRestaurantLocale.value = singleRest
+        emit(singleRest)
+
+        merge(refreshLocalLike, refreshGlobalLike)
+            .buffer(1, BufferOverflow.DROP_OLDEST)
+            .collect { value ->
+                if (value is Unit) {
+                    val singleRestaurantRefresh = getSingleRestaurantsOnApi(restaurantId)
+                    singleRestaurantLocale.value = singleRestaurantRefresh
+                    emit(singleRestaurantRefresh)
+                } else if (value is Int) {
+                    val currentRest = singleRestaurantLocale.value
+                    val newRest = currentRest?.copy(isLike = !currentRest.isLike)
+                    singleRestaurantLocale.value = newRest
+                    newRest?.let { emit(newRest) }
+                }
+            }
     }
 
     private suspend fun getSingleRestaurantsOnApi(
