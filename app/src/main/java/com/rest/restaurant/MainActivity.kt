@@ -7,19 +7,23 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.rest.restaurant.navigation.AppNavGraph
 import com.rest.restaurant.navigation.Screen
 import com.rest.restaurant.navigation.rememberNavigationState
 import com.rest.restaurant.ui.screens.details.DetailsScreen
+import com.rest.restaurant.ui.screens.favourites.FavouriteScreen
 import com.rest.restaurant.ui.screens.restaurants.RestaurantsScreen
 import com.rest.restaurant.ui.theme.RestaurantTheme
 import com.rest.restaurant.ui.widgets.FavouriteToolbarComponent
@@ -33,7 +37,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RestaurantTheme {
+                val viewModel: MainViewModel = hiltViewModel()
                 val navigationState = rememberNavigationState()
+
+                val countLikes = viewModel.countLikes.collectAsState()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -49,13 +56,18 @@ class MainActivity : ComponentActivity() {
                                 )
                             },
                             actions = {
-                                FavouriteToolbarComponent(
-                                    count = 15,
-                                    isFilled = navigationState.screenIsFavourite(),
+                                IconButton(
+                                    content = {
+                                        FavouriteToolbarComponent(
+                                            count = countLikes.value,
+                                            isFilled = navigationState.screenIsFavourite(),
+                                        )
+                                    },
                                     onClick = {
                                         navigationState.navigateTo(Screen.ROUTE_FAVOURITE)
                                     }
                                 )
+
                             }
                         )
                     }
@@ -76,7 +88,14 @@ class MainActivity : ComponentActivity() {
                                 restaurantId = restaurantId,
                             )
                         },
-                        favouriteScreenContent = { },
+                        favouriteScreenContent = {
+                            FavouriteScreen(
+                                innerPadding = innerPadding,
+                                onRestaurantClick = { id ->
+                                    navigationState.navigateToSingleRestaurant(restaurantId = id)
+                                }
+                            )
+                        },
                     )
                 }
             }

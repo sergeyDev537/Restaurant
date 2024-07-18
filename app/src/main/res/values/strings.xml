@@ -4,4 +4,7 @@
     <string name="restaurants">Restaurants</string>
     <string name="restaurant">Restaurant</string>
     <string name="favourite">Favourites</string>
+
+    <!--ERRORS-->
+    <string name="error_like">Лайк не поставился, попробуйте ещё раз)</string>
 </resources>
