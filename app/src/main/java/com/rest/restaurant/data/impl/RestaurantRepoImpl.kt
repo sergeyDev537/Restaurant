@@ -8,6 +8,7 @@ import com.rest.restaurant.domain.entity.Restaurant
 import com.rest.restaurant.domain.repos.RestaurantRepo
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
@@ -119,6 +120,14 @@ class RestaurantRepoImpl @Inject constructor(
     }
 
     override fun getCountLikesRestaurant(): Flow<Int> = flow {
+        updateCounter()
+
+        refreshGlobalLike.collect {
+            updateCounter()
+        }
+    }
+
+    private suspend fun FlowCollector<Int>.updateCounter() {
         emit(storage.countFavourites)
     }
 

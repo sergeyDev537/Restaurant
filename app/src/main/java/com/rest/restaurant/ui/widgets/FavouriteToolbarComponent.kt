@@ -34,7 +34,7 @@ fun FavouriteToolbarComponent(
         Text(
             text = text,
             color = textColor,
-            fontSize = 12.sp,
+            fontSize = 10.sp,
             textAlign = TextAlign.Center
         )
     }

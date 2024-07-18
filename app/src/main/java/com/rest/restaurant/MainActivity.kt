@@ -41,6 +41,8 @@ class MainActivity : ComponentActivity() {
                 val navigationState = rememberNavigationState()
 
                 val countLikes = viewModel.countLikes.collectAsState()
+                val titleToolbarResId = navigationState.getTitleToolbar().collectAsState(R.string.restaurants)
+                val screenIsFavourite = navigationState.isScreenFavouriteFlow().collectAsState(false)
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -50,7 +52,7 @@ class MainActivity : ComponentActivity() {
                                 Text(
                                     modifier = Modifier
                                         .fillMaxWidth(),
-                                    text = stringResource(R.string.restaurants),
+                                    text = stringResource(titleToolbarResId.value),
                                     fontSize = 17.sp,
                                     textAlign = TextAlign.Center,
                                 )
@@ -60,11 +62,16 @@ class MainActivity : ComponentActivity() {
                                     content = {
                                         FavouriteToolbarComponent(
                                             count = countLikes.value,
-                                            isFilled = navigationState.screenIsFavourite(),
+                                            isFilled = screenIsFavourite.value,
                                         )
                                     },
                                     onClick = {
-                                        navigationState.navigateTo(Screen.ROUTE_FAVOURITE)
+                                        if (!navigationState.isScreenFavourite()) {
+                                            navigationState.navigateTo(Screen.ROUTE_FAVOURITE)
+                                        } else {
+                                            navigationState.navHostController.popBackStack()
+                                        }
+
                                     }
                                 )
 
